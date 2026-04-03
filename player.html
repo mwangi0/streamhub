@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>StreamHub - Watch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: #0f0f0f;
+            padding: 0.8rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #272727;
+        }
+
+        .nav-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+
+        .back-link {
+            color: #ffc107;
+            text-decoration: none;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-link:hover {
+            color: #ffca2c;
+        }
+
+        /* Video Player Section */
+        .video-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-info {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: #1a1a1a;
+            border-radius: 12px;
+        }
+
+        .video-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .video-meta {
+            color: #aaa;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 4rem;
+            background: #1a1a1a;
+            border-radius: 12px;
+            color: #ff6b6b;
+        }
+
+        .error-message h3 {
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .video-container {
+                padding: 1rem;
+            }
+            .video-title {
+                font-size: 1.2rem;
+            }
+            .nav-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">🎬 StreamHub</a>
+            <a href="index.html" class="back-link">← Back to Home</a>
+        </div>
+    </nav>
+
+    <div class="video-container">
+        <div id="playerContent">
+            <div class="error-message">
+                <h3>⏳ Loading video...</h3>
+                <p>Please wait</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get video data from URL parameters
+        function getVideoFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return {
+                embedUrl: urlParams.get('url'),
+                title: urlParams.get('title'),
+                views: urlParams.get('views')
+            };
+        }
+
+        // Load and display the video
+        function loadVideo() {
+            const video = getVideoFromURL();
+            const container = document.getElementById('playerContent');
+            
+            if (!video.embedUrl) {
+                container.innerHTML = `
+                    <div class="error-message">
+                        <h3>❌ No video selected</h3>
+                        <p>Please go back and select a video to watch</p>
+                        <a href="index.html" style="color: #ffc107; display: inline-block; margin-top: 1rem;">← Go to Home</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Display the video player
+            container.innerHTML = `
+                <div class="video-wrapper">
+                    <iframe src="${video.embedUrl}" allowfullscreen frameborder="0" allow="autoplay; fullscreen"></iframe>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">${video.title || 'Untitled Video'}</div>
+                    <div class="video-meta">
+                        <span>🎬 DoodStream</span>
+                        ${video.views ? `<span>👁️ ${video.views} views</span>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Update page title
+            document.title = `${video.title || 'Watch'} - StreamHub`;
+        }
+        
+        // Load the video when page loads
+        loadVideo();
+    </script>
+</body>
+</html>
