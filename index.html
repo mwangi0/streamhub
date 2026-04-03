@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>StreamHub - DoodStream</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ffc107;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffca2c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: #0f0f0f;
+            padding: 0.8rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #272727;
+        }
+
+        .nav-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            color: #ffc107;
+        }
+
+        .main-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .hero {
+            margin-bottom: 2rem;
+            padding: 1rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .hero h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero p {
+            color: #aaa;
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem 1.5rem;
+        }
+
+        .video-card {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .video-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .thumbnail-container {
+            position: relative;
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+
+        .thumbnail-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-info {
+            padding: 0.75rem 0.25rem;
+        }
+
+        .video-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-meta {
+            font-size: 0.75rem;
+            color: #aaa;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            background: #1a1a1a;
+            border-radius: 12px;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 4rem;
+            background: #1a1a1a;
+            border-radius: 12px;
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 4rem;
+            background: #1a1a1a;
+            border-radius: 12px;
+            color: #ff6b6b;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid #272727;
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+            }
+            .videos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 1rem;
+            }
+            .hero h1 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">🎬 StreamHub</a>
+            <ul class="nav-links">
+                <li><a class="nav-home">HOME</a></li>
+                <li><a class="nav-categories">CATEGORIES</a></li>
+                <li><a class="nav-live">LIVE CAMS</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="hero">
+            <div>
+                <h1 id="pageTitle">Recommended</h1>
+                <p id="pageDesc">Your personal video streaming platform</p>
+            </div>
+        </div>
+
+        <div class="videos-grid" id="videosGrid">
+            <div class="loading-state">
+                <h3>⏳ Loading videos...</h3>
+                <p>Please wait while we fetch your content from DoodStream</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 2024 StreamHub - Powered by DoodStream</p>
+    </div>
+
+    <script>
+        const DOODSTREAM_API_KEY = "479311df279p7jvv1kqtm0";
+        const DOODSTREAM_API_URL = "https://doodapi.com/api";
+        
+        let allVideos = [];
+        
+        function showLoadingState() {
+            const grid = document.getElementById('videosGrid');
+            grid.innerHTML = `
+                <div class="loading-state">
+                    <h3>⏳ Loading videos...</h3>
+                    <p>Please wait while we fetch your content from DoodStream</p>
+                </div>
+            `;
+        }
+        
+        function showEmptyState() {
+            const grid = document.getElementById('videosGrid');
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <h3>📁 No videos found</h3>
+                    <p>Upload some videos to your DoodStream account first</p>
+                    <p style="margin-top: 10px; font-size: 12px;">Visit <a href="https://doodstream.com" style="color: #ffc107;">doodstream.com</a> to upload</p>
+                </div>
+            `;
+        }
+        
+        function showErrorState(errorMessage) {
+            const grid = document.getElementById('videosGrid');
+            grid.innerHTML = `
+                <div class="error-state">
+                    <h3>❌ Error loading videos</h3>
+                    <p>${errorMessage}</p>
+                    <p style="margin-top: 10px; font-size: 12px;">Make sure your API key is correct and you have videos uploaded</p>
+                </div>
+            `;
+        }
+        
+        function formatViews(views) {
+            if (!views) return "0 views";
+            if (views >= 1000000) return (views / 1000000).toFixed(1) + "M views";
+            if (views >= 1000) return (views / 1000).toFixed(1) + "K views";
+            return views + " views";
+        }
+        
+        function formatFileSize(bytes) {
+            if (!bytes || bytes === 0) return "Unknown size";
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i];
+        }
+        
+        function renderVideoGrid(videos) {
+            const grid = document.getElementById('videosGrid');
+            
+            if (!videos || videos.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            let html = '';
+            
+            videos.forEach(video => {
+                const displayTitle = video.title.length > 50 ? video.title.substring(0, 50) + '...' : video.title;
+                const viewsText = formatViews(video.views);
+                const sizeText = formatFileSize(video.size);
+                
+                html += `
+                    <div class="video-card" data-embed-url="${video.embedUrl}" data-video-title="${video.title.replace(/'/g, "\\'")}">
+                        <div class="thumbnail-container">
+                            <img class="thumbnail-img" src="${video.thumbnail}" alt="${video.title}" 
+                                 onerror="this.src='https://via.placeholder.com/320x180?text=No+Thumbnail'">
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">${displayTitle}</div>
+                            <div class="video-meta">${viewsText} • ${sizeText}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            grid.innerHTML = html;
+            
+            document.querySelectorAll('.video-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const embedUrl = card.dataset.embedUrl;
+                    const videoTitle = card.dataset.videoTitle;
+                    openVideoPlayer(embedUrl, videoTitle);
+                });
+            });
+        }
+        
+        function openVideoPlayer(embedUrl, videoTitle) {
+            const playerWindow = window.open('', '_blank');
+            playerWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>${videoTitle} - StreamHub</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body {
+                            background: #0f0f0f;
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            min-height: 100vh;
+                        }
+                        .video-container {
+                            max-width: 1200px;
+                            margin: 0 auto;
+                            padding: 20px;
+                        }
+                        .video-wrapper {
+                            position: relative;
+                            width: 100%;
+                            padding-bottom: 56.25%;
+                            background: #000;
+                            border-radius: 12px;
+                            overflow: hidden;
+                        }
+                        .video-wrapper iframe {
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            border: none;
+                        }
+                        .video-title {
+                            color: white;
+                            font-size: 1.2rem;
+                            margin-top: 1rem;
+                            padding: 0.5rem 0;
+                        }
+                        .back-button {
+                            background: #ffc107;
+                            color: #000;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 25px;
+                            cursor: pointer;
+                            margin-top: 1rem;
+                            font-weight: bold;
+                        }
+                        .back-button:hover {
+                            background: #ffca2c;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <iframe src="${embedUrl}" allowfullscreen frameborder="0"></iframe>
+                        </div>
+                        <div class="video-title">${videoTitle}</div>
+                        <button class="back-button" onclick="window.close()">← Close Player</button>
+                    </div>
+                </body>
+                </html>
+            `);
+            playerWindow.document.close();
+        }
+        
+        async function fetchVideosFromDoodStream() {
+            try {
+                showLoadingState();
+                
+                console.log("Fetching videos from DoodStream...");
+                
+                const response = await fetch(`${DOODSTREAM_API_URL}/file/list?key=${DOODSTREAM_API_KEY}&page=1&per_page=100`);
+                const filesData = await response.json();
+                
+                console.log("API Response:", filesData);
+                
+                if (filesData.msg !== "ok") {
+                    throw new Error(filesData.msg || "Failed to fetch video list");
+                }
+                
+                if (!filesData.result || !filesData.result.files || filesData.result.files.length === 0) {
+                    showEmptyState();
+                    return;
+                }
+                
+                allVideos = filesData.result.files.map(file => ({
+                    id: file.file_code,
+                    title: file.title || file.file_name || "Untitled Video",
+                    thumbnail: `https://img.doodcdn.com/thumbnails/${file.file_code}.jpg`,
+                    embedUrl: `https://doodstream.com/e/${file.file_code}`,
+                    duration: file.length || "Unknown",
+                    views: parseInt(file.views) || 0,
+                    size: parseInt(file.size) || 0
+                }));
+                
+                console.log(`Loaded ${allVideos.length} videos from DoodStream`);
+                renderVideoGrid(allVideos);
+                
+            } catch (error) {
+                console.error("Error fetching videos:", error);
+                showErrorState(error.message);
+            }
+        }
+        
+        function setupNavigation() {
+            document.querySelector('.nav-home').addEventListener('click', () => {
+                document.getElementById('pageTitle').textContent = 'Recommended';
+                document.getElementById('pageDesc').textContent = 'Your personal video streaming platform';
+                renderVideoGrid(allVideos);
+            });
+            
+            document.querySelector('.nav-categories').addEventListener('click', () => {
+                document.getElementById('pageTitle').textContent = 'Categories';
+                document.getElementById('pageDesc').textContent = 'Browse by category';
+                document.querySelector('.videos-grid').innerHTML = `
+                    <div class="empty-state">
+                        <h3>🏷️ Categories Coming Soon</h3>
+                        <p>This feature will be available in the next update</p>
+                    </div>
+                `;
+            });
+            
+            document.querySelector('.nav-live').addEventListener('click', () => {
+                document.getElementById('pageTitle').textContent = 'Live Cams';
+                document.getElementById('pageDesc').textContent = 'Live streaming';
+                document.querySelector('.videos-grid').innerHTML = `
+                    <div class="empty-state">
+                        <h3>📡 Live Cams Coming Soon</h3>
+                        <p>This feature will be available in the next update</p>
+                    </div>
+                `;
+            });
+        }
+        
+        async function init() {
+            setupNavigation();
+            await fetchVideosFromDoodStream();
+        }
+        
+        init();
+    </script>
+</body>
+</html>
