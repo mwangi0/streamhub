@@ -119,6 +119,9 @@
         .video-card {
             cursor: pointer;
             transition: transform 0.2s;
+            text-decoration: none;
+            color: #fff;
+            display: block;
         }
 
         .video-card:hover {
@@ -207,7 +210,7 @@
 <body>
     <nav class="navbar">
         <div class="nav-container">
-            <a href="/" class="logo">🎬 StreamHub</a>
+            <a href="index.html" class="logo">🎬 StreamHub</a>
             <ul class="nav-links">
                 <li><a class="nav-home">HOME</a></li>
                 <li><a class="nav-categories">CATEGORIES</a></li>
@@ -268,7 +271,6 @@
                 <div class="error-state">
                     <h3>❌ Error loading videos</h3>
                     <p>${errorMessage}</p>
-                    <p style="margin-top: 10px; font-size: 12px;">The API is working but CORS is blocking it. This requires a backend proxy.</p>
                     <p style="margin-top: 5px; font-size: 12px;">Your video is available at: <a href="https://doodstream.com/e/xkq01upu0cre" target="_blank" style="color: #ffc107;">Click here to watch</a></p>
                 </div>
             `;
@@ -295,8 +297,11 @@
                 const displayTitle = video.title.length > 50 ? video.title.substring(0, 50) + '...' : video.title;
                 const viewsText = formatViews(video.views);
                 
+                // Create link to player.html with video data in URL
+                const playerUrl = `player.html?url=${encodeURIComponent(video.embedUrl)}&title=${encodeURIComponent(video.title)}&views=${encodeURIComponent(viewsText)}`;
+                
                 html += `
-                    <div class="video-card" data-embed-url="${video.embedUrl}" data-video-title="${video.title.replace(/'/g, "\\'")}">
+                    <a href="${playerUrl}" class="video-card">
                         <div class="thumbnail-container">
                             <img class="thumbnail-img" src="${video.thumbnail}" alt="${video.title}" 
                                  onerror="this.src='https://via.placeholder.com/320x180?text=No+Thumbnail'">
@@ -305,97 +310,14 @@
                             <div class="video-title">${displayTitle}</div>
                             <div class="video-meta">${viewsText}</div>
                         </div>
-                    </div>
+                    </a>
                 `;
             });
             
             grid.innerHTML = html;
-            
-            document.querySelectorAll('.video-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const embedUrl = card.dataset.embedUrl;
-                    const videoTitle = card.dataset.videoTitle;
-                    openVideoPlayer(embedUrl, videoTitle);
-                });
-            });
         }
         
-        function openVideoPlayer(embedUrl, videoTitle) {
-            const playerWindow = window.open('', '_blank');
-            playerWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>${videoTitle} - StreamHub</title>
-                    <style>
-                        * { margin: 0; padding: 0; box-sizing: border-box; }
-                        body {
-                            background: #0f0f0f;
-                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                            min-height: 100vh;
-                        }
-                        .video-container {
-                            max-width: 1200px;
-                            margin: 0 auto;
-                            padding: 20px;
-                        }
-                        .video-wrapper {
-                            position: relative;
-                            width: 100%;
-                            padding-bottom: 56.25%;
-                            background: #000;
-                            border-radius: 12px;
-                            overflow: hidden;
-                        }
-                        .video-wrapper iframe {
-                            position: absolute;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            border: none;
-                        }
-                        .video-title {
-                            color: white;
-                            font-size: 1.2rem;
-                            margin-top: 1rem;
-                            padding: 0.5rem 0;
-                        }
-                        .back-button {
-                            background: #ffc107;
-                            color: #000;
-                            border: none;
-                            padding: 10px 20px;
-                            border-radius: 25px;
-                            cursor: pointer;
-                            margin-top: 1rem;
-                            font-weight: bold;
-                        }
-                        .back-button:hover {
-                            background: #ffca2c;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="video-container">
-                        <div class="video-wrapper">
-                            <iframe src="${embedUrl}" allowfullscreen frameborder="0"></iframe>
-                        </div>
-                        <div class="video-title">${videoTitle}</div>
-                        <button class="back-button" onclick="window.close()">← Close Player</button>
-                    </div>
-                </body>
-                </html>
-            `);
-            playerWindow.document.close();
-        }
-        
-        // Since CORS is blocking direct API calls, we'll use a different approach
-        // We'll manually add your video since we know it exists from the API test
         function loadVideosManually() {
-            // From your API response, you have 1 video
             const videoData = {
                 id: "xkq01upu0cre",
                 title: "dream-chaser 3840x2160",
@@ -442,10 +364,8 @@
         async function init() {
             setupNavigation();
             
-            // Try API first, fallback to manual if CORS fails
             try {
                 showLoadingState();
-                // Try using a different proxy that works better
                 const proxyUrl = 'https://corsproxy.io/?';
                 const apiUrl = `https://doodapi.com/api/file/list?key=${DOODSTREAM_API_KEY}&page=1&per_page=100`;
                 
