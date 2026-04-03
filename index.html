@@ -406,7 +406,11 @@
                 
                 console.log("Fetching videos from DoodStream...");
                 
-                const response = await fetch(`${DOODSTREAM_API_URL}/file/list?key=${DOODSTREAM_API_KEY}&page=1&per_page=100`);
+                // Using CORS proxy to bypass the restriction
+                const proxyUrl = 'https://api.allorigins.win/raw?url=';
+                const apiUrl = `${DOODSTREAM_API_URL}/file/list?key=${DOODSTREAM_API_KEY}&page=1&per_page=100`;
+                
+                const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
                 const filesData = await response.json();
                 
                 console.log("API Response:", filesData);
