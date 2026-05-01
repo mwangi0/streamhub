@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>StreamHub - Video Platform</title>
+    <title>StreamHub - DoodStream</title>
     <style>
         * {
             margin: 0;
@@ -24,6 +24,10 @@
         ::-webkit-scrollbar-thumb {
             background: #ffc107;
             border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ffca2c;
         }
 
         body {
@@ -158,7 +162,14 @@
             color: #aaa;
         }
 
-        .empty-state, .loading-state, .error-state {
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            background: #1a1a1a;
+            border-radius: 12px;
+        }
+
+        .loading-state {
             text-align: center;
             padding: 4rem;
             background: #1a1a1a;
@@ -166,6 +177,10 @@
         }
 
         .error-state {
+            text-align: center;
+            padding: 4rem;
+            background: #1a1a1a;
+            border-radius: 12px;
             color: #ff6b6b;
         }
 
@@ -215,27 +230,17 @@
         <div class="videos-grid" id="videosGrid">
             <div class="loading-state">
                 <h3>⏳ Loading videos...</h3>
-                <p>Please wait while we fetch your content</p>
+                <p>Please wait while we fetch your content from DoodStream</p>
             </div>
         </div>
     </div>
 
     <div class="footer">
-        <p>© 2024 StreamHub - Video Platform</p>
+        <p>© 2024 StreamHub - Powered by DoodStream</p>
     </div>
 
     <script>
-        // ⚠️ WARNING: This API key is publicly exposed!
-        // Anyone can see and use it. Regenerate it immediately on StreamHub!
-        const API_KEY = "0f92bed49f55e08f8918";
-        
-        // ============================================
-        // CRITICAL: These URLs NEED to be corrected!
-        // I don't know StreamHub's actual API endpoints.
-        // Please provide the correct API documentation.
-        // ============================================
-        const STREAMHUB_API_BASE = "https://api.streamhub.com/v1";
-        const STREAMHUB_ENDPOINT = "/videos";
+        const DOODSTREAM_API_KEY = "479311df279p7jvv1kqtm0";
         
         let allVideos = [];
         
@@ -244,7 +249,7 @@
             grid.innerHTML = `
                 <div class="loading-state">
                     <h3>⏳ Loading videos...</h3>
-                    <p>Please wait while we fetch your content</p>
+                    <p>Please wait while we fetch your content from DoodStream</p>
                 </div>
             `;
         }
@@ -254,7 +259,8 @@
             grid.innerHTML = `
                 <div class="empty-state">
                     <h3>📁 No videos found</h3>
-                    <p>Upload some videos to your StreamHub account first</p>
+                    <p>Upload some videos to your DoodStream account first</p>
+                    <p style="margin-top: 10px; font-size: 12px;">Visit <a href="https://doodstream.com" style="color: #ffc107;">doodstream.com</a> to upload</p>
                 </div>
             `;
         }
@@ -265,7 +271,7 @@
                 <div class="error-state">
                     <h3>❌ Error loading videos</h3>
                     <p>${errorMessage}</p>
-                    <p style="margin-top: 10px; font-size: 12px;">API endpoints need to be corrected. Please provide StreamHub API documentation.</p>
+                    <p style="margin-top: 5px; font-size: 12px;">Your video is available at: <a href="https://doodstream.com/e/xkq01upu0cre" target="_blank" style="color: #ffc107;">Click here to watch</a></p>
                 </div>
             `;
         }
@@ -291,12 +297,13 @@
                 const displayTitle = video.title.length > 50 ? video.title.substring(0, 50) + '...' : video.title;
                 const viewsText = formatViews(video.views);
                 
+                // Create link to player.html with video data in URL
                 const playerUrl = `player.html?url=${encodeURIComponent(video.embedUrl)}&title=${encodeURIComponent(video.title)}&views=${encodeURIComponent(viewsText)}`;
                 
                 html += `
                     <a href="${playerUrl}" class="video-card">
                         <div class="thumbnail-container">
-                            <img src="${video.thumbnail}" alt="${video.title}" 
+                            <img class="thumbnail-img" src="${video.thumbnail}" alt="${video.title}" 
                                  onerror="this.src='https://via.placeholder.com/320x180?text=No+Thumbnail'">
                         </div>
                         <div class="video-info">
@@ -310,80 +317,18 @@
             grid.innerHTML = html;
         }
         
-        // Sample fallback videos
-        function loadSampleVideos() {
-            allVideos = [
-                {
-                    id: "sample1",
-                    title: "⚠️ API Not Configured - Please provide StreamHub API documentation",
-                    thumbnail: "https://via.placeholder.com/320x180?text=API+Needs+Setup",
-                    embedUrl: "#",
-                    views: 0
-                }
-            ];
+        function loadVideosManually() {
+            const videoData = {
+                id: "xkq01upu0cre",
+                title: "dream-chaser 3840x2160",
+                thumbnail: "https://thumbcdn.com/snaps/vmwzevmkw0z97ur3.jpg",
+                embedUrl: "https://doodstream.com/e/xkq01upu0cre",
+                views: 0
+            };
+            
+            allVideos = [videoData];
+            console.log(`Loaded ${allVideos.length} video manually`);
             renderVideoGrid(allVideos);
-            showErrorState("StreamHub API endpoints need to be corrected. Please share the API documentation.");
-        }
-        
-        async function loadVideos() {
-            try {
-                showLoadingState();
-                
-                // Attempt to fetch from StreamHub API
-                const apiUrl = `${STREAMHUB_API_BASE}${STREAMHUB_ENDPOINT}`;
-                
-                console.log("Attempting to fetch:", apiUrl);
-                console.log("Using API Key:", API_KEY);
-                
-                // Try authentication as Bearer token
-                const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${API_KEY}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                console.log("API Response:", data);
-                
-                // Try to extract videos from response (adjust based on actual API)
-                let videos = [];
-                if (Array.isArray(data)) {
-                    videos = data;
-                } else if (data.videos && Array.isArray(data.videos)) {
-                    videos = data.videos;
-                } else if (data.data && Array.isArray(data.data)) {
-                    videos = data.data;
-                } else if (data.results && Array.isArray(data.results)) {
-                    videos = data.results;
-                } else {
-                    throw new Error("Unknown response format");
-                }
-                
-                if (videos.length > 0) {
-                    allVideos = videos.map(video => ({
-                        id: video.id || video.video_id || video.file_code,
-                        title: video.title || video.name || video.file_name || "Untitled Video",
-                        thumbnail: video.thumbnail || video.thumb || video.thumbnail_url || "https://via.placeholder.com/320x180?text=No+Thumbnail",
-                        embedUrl: video.embed_url || video.stream_url || video.url || video.file_code ? `https://streamhub.com/e/${video.file_code || video.id}` : "#",
-                        views: video.views || video.view_count || 0
-                    }));
-                    renderVideoGrid(allVideos);
-                } else {
-                    loadSampleVideos();
-                }
-                
-            } catch (error) {
-                console.error("API Error:", error);
-                loadSampleVideos();
-                showErrorState(`API Error: ${error.message}. The API endpoints need to be corrected.`);
-            }
         }
         
         function setupNavigation() {
@@ -396,7 +341,7 @@
             document.querySelector('.nav-categories').addEventListener('click', () => {
                 document.getElementById('pageTitle').textContent = 'Categories';
                 document.getElementById('pageDesc').textContent = 'Browse by category';
-                document.getElementById('videosGrid').innerHTML = `
+                document.querySelector('.videos-grid').innerHTML = `
                     <div class="empty-state">
                         <h3>🏷️ Categories Coming Soon</h3>
                         <p>This feature will be available in the next update</p>
@@ -407,7 +352,7 @@
             document.querySelector('.nav-live').addEventListener('click', () => {
                 document.getElementById('pageTitle').textContent = 'Live Cams';
                 document.getElementById('pageDesc').textContent = 'Live streaming';
-                document.getElementById('videosGrid').innerHTML = `
+                document.querySelector('.videos-grid').innerHTML = `
                     <div class="empty-state">
                         <h3>📡 Live Cams Coming Soon</h3>
                         <p>This feature will be available in the next update</p>
@@ -418,7 +363,31 @@
         
         async function init() {
             setupNavigation();
-            await loadVideos();
+            
+            try {
+                showLoadingState();
+                const proxyUrl = 'https://corsproxy.io/?';
+                const apiUrl = `https://doodapi.com/api/file/list?key=${DOODSTREAM_API_KEY}&page=1&per_page=100`;
+                
+                const response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
+                const filesData = await response.json();
+                
+                if (filesData.msg === "OK" && filesData.result && filesData.result.files) {
+                    allVideos = filesData.result.files.map(file => ({
+                        id: file.file_code,
+                        title: file.title || file.file_name || "Untitled Video",
+                        thumbnail: `https://thumbcdn.com/snaps/${file.single_img ? file.single_img.split('/').pop() : file.file_code + '.jpg'}`,
+                        embedUrl: `https://doodstream.com/e/${file.file_code}`,
+                        views: parseInt(file.views) || 0
+                    }));
+                    renderVideoGrid(allVideos);
+                } else {
+                    throw new Error("API returned unexpected data");
+                }
+            } catch (error) {
+                console.log("API failed, using manual fallback:", error);
+                loadVideosManually();
+            }
         }
         
         init();
